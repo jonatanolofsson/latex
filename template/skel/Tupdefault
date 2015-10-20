@@ -1,0 +1,2 @@
+include_rules
+: foreach *.eps.py |> !python |> %B ${TOP}/<images>

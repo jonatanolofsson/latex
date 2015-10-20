@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+""" Command line interface to report """
+import sys
+import os
+import argparse
+THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+REPORT_DIR = os.path.dirname(THIS_DIR)
+sys.path.insert(0, REPORT_DIR)
+
+from report import report
+
+FNMAP = {
+    "init": report.init,
+    "add": report.add_chapter,
+    "remove": report.remove_chapter,
+    "rename": report.rename_chapter
+}
+
+def parse_args(*argv):
+    """ Parse arguments """
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('action', choices=FNMAP.keys())
+    return argparser.parse_known_args(argv)
+
+
+def main(*argv):
+    """ Main """
+    args, other = parse_args(*argv)
+    FNMAP[args.action](*other)
+
+if __name__ == '__main__':
+    main(*sys.argv[1:])
