@@ -1,0 +1,2 @@
+include_rules
+: foreach *.ps.py |> !python |> %B ${TOP}/<images>
