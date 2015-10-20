@@ -1,6 +1,7 @@
 TOP = $(TUP_CWD)
 !python = |> python -B %f |>
 # !latex = |> (latexmk -ps -silent %f; touch %B.{aux,bcf,fls,idx,ind,lof,lot,out,toc,blg,ilg,log,aux.bak,idx.bak,dvi}) |> %B.ps | %B.fdb_latexmk %B.aux %B.bcf %B.fls %B.idx %B.ind %B.lof %B.lot %B.out %B.toc %B.blg %B.ilg %B.log %B.aux.bak %B.idx.bak %B.dvi
-!latex = |> (latexmk -ps -silent %f; rm -f %B.{aux,bcf,fls,idx,ind,lof,lot,out,toc,blg,ilg,log,aux.bak,idx.bak,dvi,fdb_latexmk}) |> %B.ps
+# !latex = |> (latexmk -ps -silent %f; rm -f %B.{aux,bcf,fls,idx,ind,lof,lot,out,toc,blg,ilg,log,aux.bak,idx.bak,dvi,fdb_latexmk}) |> %B.ps
+!latex = |> (latexmk -pdf -silent %f &> /dev/null; rm -f %B.{aux,bcf,fls,idx,ind,lof,lot,out,toc,blg,ilg,log,aux.bak,idx.bak,fdb_latexmk}) |> %B.pdf
 !ps2pdf = |> ps2pdf %f |> %B.pdf
 .gitignore
