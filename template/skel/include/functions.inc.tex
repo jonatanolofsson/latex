@@ -13,7 +13,7 @@
 \renewcommand{\cos}[1]{cos\left(#1\right)}
 
 %% Initialize new chapter
-\newcommand{\newchapter}[1]{
+\newcommand{\newchapter}[1]{%
 	\renewcommand{\currentchapter}{#1}
 	\include*{#1/#1}
     \clearpage

@@ -60,18 +60,21 @@ def add_chapter(*argv):
     """ Add chapter """
     assert _is_inside_report(), "Must be inside report directory"
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("name", help="Chapter name")
+    argparser.add_argument("names", help="Chapter names", nargs='+')
     argparser.add_argument('--appendix', "-a", help="Insert chapter as appendix",
                            action="store_true")
     args = argparser.parse_args(argv)
-    assert not os.path.exists(args.name), "Chapter exists"
-    marker = 'appendices' if args.appendix else "chapters"
-    os.makedirs(args.name)
-    with open(os.path.join(CHAPTER_TEMPLATE, 'chapter.tex'), 'r') as input_file:
-        with open(os.path.join(args.name, args.name + '.tex'), 'w') as output_file:
-            output_file.write(input_file.read().format(name=args.name))
-    _insert(_indexfile(), marker, '\\\\newchapter{{{}}}'.format(args.name))
-    print("Add appendix" if args.appendix else "Add chapter", args.name)
+    for name in args.names:
+        if os.path.exists(name):
+            print("Chapter exists: ", name)
+            continue
+        marker = 'appendices' if args.appendix else "chapters"
+        os.makedirs(name)
+        with open(os.path.join(CHAPTER_TEMPLATE, 'chapter.tex'), 'r') as input_file:
+            with open(os.path.join(name, name + '.tex'), 'w') as output_file:
+                output_file.write(input_file.read().format(name=name, capname=name.capitalize()))
+        _insert(_indexfile(), marker, '\\\\newchapter{{{}}}'.format(name))
+        print("Add appendix" if args.appendix else "Add chapter", name)
 
 
 def remove_chapter(*argv):
