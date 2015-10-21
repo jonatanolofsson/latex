@@ -9,13 +9,19 @@ REPORT_DIR = os.path.dirname(THIS_DIR)
 TEMPLATE_DIR = os.path.join(REPORT_DIR, 'template')
 INIT_TEMPLATE = os.path.join(TEMPLATE_DIR, "skel")
 CHAPTER_TEMPLATE = os.path.join(TEMPLATE_DIR, "chapter")
-INDEXFILE = 'report.tex'
+DEFAULT_INDEXFILE = 'report.tex'
 SED = ['sed']
 
 
 def _indexfile():
     """ Get name of index texfile """
-    return INDEXFILE
+    texfiles = [f for f in os.listdir() if f.endswith('.tex')]
+    if len(texfiles) == 1:
+        return texfiles[0]
+    else:
+        if len(texfiles) > 1:
+            assert DEFAULT_INDEXFILE in texfiles, "Multiple texfiles found, but no default"
+        return DEFAULT_INDEXFILE
 
 
 def _is_inside_report():
