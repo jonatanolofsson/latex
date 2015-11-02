@@ -1,5 +1,6 @@
-""" Report generator """
+"""Report generator."""
 import os
+import sys
 import argparse
 import shutil
 import subprocess
@@ -10,49 +11,51 @@ TEMPLATE_DIR = os.path.join(REPORT_DIR, 'template')
 INIT_TEMPLATE = os.path.join(TEMPLATE_DIR, "skel")
 CHAPTER_TEMPLATE = os.path.join(TEMPLATE_DIR, "chapter")
 DEFAULT_INDEXFILE = 'report.tex'
-SED = ['sed']
+SED = ['gsed' if sys.platform == 'darwin' else 'sed']
 
 
 def _indexfile():
-    """ Get name of index texfile """
+    """Get name of index texfile."""
     texfiles = [f for f in os.listdir() if f.endswith('.tex')]
     if len(texfiles) == 1:
         return texfiles[0]
     else:
         if len(texfiles) > 1:
-            assert DEFAULT_INDEXFILE in texfiles, "Multiple texfiles found, but no default"
+            assert DEFAULT_INDEXFILE in texfiles, \
+                "Multiple texfiles found, but no default"
         return DEFAULT_INDEXFILE
 
 
 def _is_inside_report():
-    """ Check if inside report directory """
+    """Check if inside report directory."""
     return os.path.exists(_indexfile())
 
 
 def _sed_replace(file_, match, replacement):
-    """ Run sed, inplace on file, to replace string """
-    subprocess.run(SED + ['-i', 's/' + match + '/' + replacement + '/', file_])
+    """Run sed, inplace on file, to replace string."""
+    subprocess.run(SED + ['-i', 's/' + match + '/' + replacement + '/',
+                   file_])
 
 
 def _sed_remove(file_, match):
-    """ Run sed, inplace on file, to replace string """
+    """Run sed, inplace on file, to replace string."""
     subprocess.run(SED + ['-i', '/' + match + '/d', file_])
 
 
 def _insert(file_, tag, string, after_marker=False):
-    """ Add text at marker in file """
+    """Add text at marker in file."""
     replacement = '%%::' + tag + '::%%\\n' + string if after_marker \
         else string + '\\n%%::' + tag + '::%%'
-    _sed_replace(file_, '%%::' + tag + '::%%', replacement)
+    _sed_replace(file_, '^%%::' + tag + '::%%$', replacement)
 
 
 def _newchapter(name):
-    """ Return string for \newchapter """
+    """Return tex tag for newchapter."""
     return '\\\\newchapter{{{}}}'.format(name)
 
 
 def init(*argv):
-    """ Create a new report """
+    """Create a new report."""
     argparser = argparse.ArgumentParser()
     argparser.add_argument("name", help="Directory name")
     args = argparser.parse_args(argv)
@@ -63,11 +66,12 @@ def init(*argv):
 
 
 def add_chapter(*argv):
-    """ Add chapter """
+    """Add chapter."""
     assert _is_inside_report(), "Must be inside report directory"
     argparser = argparse.ArgumentParser()
     argparser.add_argument("names", help="Chapter names", nargs='+')
-    argparser.add_argument('--appendix', "-a", help="Insert chapter as appendix",
+    argparser.add_argument('--appendix', "-a",
+                           help="Insert chapter as appendix",
                            action="store_true")
     args = argparser.parse_args(argv)
     for name in args.names:
@@ -76,27 +80,29 @@ def add_chapter(*argv):
             continue
         marker = 'appendices' if args.appendix else "chapters"
         os.makedirs(name)
-        with open(os.path.join(CHAPTER_TEMPLATE, 'chapter.tex'), 'r') as input_file:
+        with open(os.path.join(CHAPTER_TEMPLATE, 'chapter.tex'), 'r') \
+                as input_file:
             with open(os.path.join(name, name + '.tex'), 'w') as output_file:
-                output_file.write(input_file.read().format(name=name, capname=name.capitalize()))
+                output_file.write(input_file.read().format(
+                    name=name, capname=name.capitalize()))
         _insert(_indexfile(), marker, '\\\\newchapter{{{}}}'.format(name))
         print("Add appendix" if args.appendix else "Add chapter", name)
 
 
 def remove_chapter(*argv):
-    """ Remove chapter """
+    """Remove chapter."""
     assert _is_inside_report(), "Must be inside report directory"
     argparser = argparse.ArgumentParser()
     argparser.add_argument("name", help="Chapter name")
     args = argparser.parse_args(argv)
     assert os.path.exists(args.name), "Chapter does not exist"
     shutil.rmtree(args.name)
-    _sed_remove(_indexfile(), _newchapter(args.name))
+    _sed_remove(_indexfile(), '^' + _newchapter(args.name) + '$')
     print("Removed chapter ", args.name)
 
 
 def rename_chapter(*argv):
-    """ Rename chapter """
+    """Rename chapter."""
     assert _is_inside_report(), "Must be inside report directory"
     argparser = argparse.ArgumentParser()
     argparser.add_argument("name", help="Chapter name")
@@ -104,7 +110,7 @@ def rename_chapter(*argv):
     args = argparser.parse_args(argv)
     assert os.path.exists(args.name), "Chapter does not exist"
     shutil.move(args.name, args.newname)
-    _sed_replace(_indexfile(), _newchapter(args.name), _newchapter(args.newname))
+    _sed_replace(_indexfile(),
+                 _newchapter(args.name),
+                 _newchapter(args.newname))
     print("Renamed chapter ", args.name, ' -> ', args.newname)
-
-
