@@ -1,11 +1,10 @@
 \newcommand{\currentchapter}{}
-\newcommand{\fig}[4][]{%
-  \begin{figure}[h]
-    \centering
-    \includegraphics[width=#1\linewidth]{\currentchapter/figures/#2}
-    \caption{#3}
-    \label{#4}
-  \end{figure}
+\newcommand{\fig}[4]{%
+  \begin{figure}[H]%
+    \centering%
+    \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
+    \caption{#3}\label{#4}%
+  \end{figure}%
 }
 
 %% Math functions
