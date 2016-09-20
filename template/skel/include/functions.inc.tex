@@ -1,8 +1,21 @@
 \newcommand{\currentchapter}{}
+\newcommand{\image}[2]{%
+  \begin{figure}[H]%
+    \centering%
+    \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
+  \end{figure}%
+}
 \newcommand{\fig}[4]{%
   \begin{figure}[H]%
     \centering%
     \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
+    \caption{#3}\label{#4}%
+  \end{figure}%
+}
+\newcommand{\tikzfig}[4]{%
+  \begin{figure}[H]%
+    \centering%
+    \resizebox{#1\linewidth}{!}{\input{\currentchapter/#2}}%
     \caption{#3}\label{#4}%
   \end{figure}%
 }

@@ -1,2 +1,2 @@
 include_rules
-: foreach *.tex.py *.pdf.py *.eps.py |> !python |> %B $(TOP)/<pretex>
+: foreach *.png.py *.tex.py *.pdf.py *.eps.py |> !python |> %B $(TOP)/<pretex>

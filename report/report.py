@@ -10,25 +10,44 @@ REPORT_DIR = os.path.dirname(THIS_DIR)
 TEMPLATE_DIR = os.path.join(REPORT_DIR, 'template')
 INIT_TEMPLATE = os.path.join(TEMPLATE_DIR, "skel")
 CHAPTER_TEMPLATE = os.path.join(TEMPLATE_DIR, "chapter")
+FIGURE_TEMPLATE = os.path.join(TEMPLATE_DIR, 'figure.py')
 DEFAULT_INDEXFILE = 'report.tex'
 SED = ['gsed' if sys.platform == 'darwin' else 'sed']
+GIT = ['git']
 
 
-def _indexfile():
+def _indexfile(path='.'):
     """Get name of index texfile."""
-    texfiles = [f for f in os.listdir() if f.endswith('.tex')]
+    texfiles = [f for f in os.listdir(path) if f.endswith('.tex')]
     if len(texfiles) == 1:
-        return texfiles[0]
+        return os.path.abspath(texfiles[0])
     else:
         if len(texfiles) > 1:
             assert DEFAULT_INDEXFILE in texfiles, \
                 "Multiple texfiles found, but no default"
-        return DEFAULT_INDEXFILE
+        return os.path.abspath('/'.join([path, DEFAULT_INDEXFILE]))
 
 
 def _is_inside_report():
     """Check if inside report directory."""
     return os.path.exists(_indexfile())
+
+
+def _is_inside_chapter():
+    """Check if inside chapter directory."""
+    return os.path.exists(os.path.join('..', _indexfile('..')))
+
+
+def _git_reference(short=True):
+    """Get hash of git directory."""
+    tag = subprocess.check_output(
+        GIT + ['tag', '--points-at', 'HEAD'],
+        universal_newlines=True).strip()
+    if not tag:
+        tag = subprocess.check_output(
+            GIT + ['rev-parse', '--short', 'HEAD'],
+            universal_newlines=True).strip()
+    return tag
 
 
 def _sed_replace(file_, match, replacement):
@@ -89,6 +108,23 @@ def add_chapter(*argv):
         print("Add appendix" if args.appendix else "Add chapter", name)
 
 
+def add_figure(*argv):
+    """Add new python figure."""
+    assert _is_inside_report(), "Must be inside report directory"
+    assert _is_inside_chapter(), "Must be inside chapter directory"
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("names", help="Figure names", nargs='+')
+    args = argparser.parse_args(argv)
+    for name in args.names:
+        filename = name + '.py'
+        if os.path.exists(filename):
+            print("Figure exists: ", name)
+            continue
+        with open(FIGURE_TEMPLATE, 'r') as input_file:
+            with open(filename, 'w') as output_file:
+                output_file.write(input_file.read().format(name=name))
+
+
 def remove_chapter(*argv):
     """Remove chapter."""
     assert _is_inside_report(), "Must be inside report directory"
@@ -114,3 +150,14 @@ def rename_chapter(*argv):
                  _newchapter(args.name),
                  _newchapter(args.newname))
     print("Renamed chapter ", args.name, ' -> ', args.newname)
+
+
+def export(*argv):
+    """Export report."""
+    assert _is_inside_report(), "Must be inside report directory"
+    with open(_indexfile(), 'r') as f:
+        filename = f.readline().strip('%').strip()
+    dst = os.path.abspath('/'.join([os.path.dirname(_indexfile()), filename]))
+    dst += '_' + _git_reference() + '.pdf'
+    src = os.path.splitext(_indexfile())[0] + '.pdf'
+    shutil.copyfile(src, dst)
