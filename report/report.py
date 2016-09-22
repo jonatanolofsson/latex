@@ -11,31 +11,30 @@ TEMPLATE_DIR = os.path.join(REPORT_DIR, 'template')
 INIT_TEMPLATE = os.path.join(TEMPLATE_DIR, "skel")
 CHAPTER_TEMPLATE = os.path.join(TEMPLATE_DIR, "chapter")
 FIGURE_TEMPLATE = os.path.join(TEMPLATE_DIR, 'figure.py')
-DEFAULT_INDEXFILE = 'report.tex'
+INDEXFILE = 'report.tex'
 SED = ['gsed' if sys.platform == 'darwin' else 'sed']
 GIT = ['git']
 
 
 def _indexfile(path='.'):
     """Get name of index texfile."""
-    texfiles = [f for f in os.listdir(path) if f.endswith('.tex')]
-    if len(texfiles) == 1:
-        return os.path.abspath(texfiles[0])
-    else:
-        if len(texfiles) > 1:
-            assert DEFAULT_INDEXFILE in texfiles, \
-                "Multiple texfiles found, but no default"
-        return os.path.abspath('/'.join([path, DEFAULT_INDEXFILE]))
+    path = os.path.abspath(path)
+    while path:
+        indexfile = os.path.abspath('/'.join([path, INDEXFILE]))
+        if os.path.exists(indexfile):
+            return indexfile
+        path = os.path.dirname(path)
+    return None
 
 
 def _is_inside_report():
     """Check if inside report directory."""
-    return os.path.exists(_indexfile())
+    return _indexfile() is not None
 
 
 def _is_inside_chapter():
     """Check if inside chapter directory."""
-    return os.path.exists(os.path.join('..', _indexfile('..')))
+    return _indexfile('..') is not None
 
 
 def _git_reference(short=True):
