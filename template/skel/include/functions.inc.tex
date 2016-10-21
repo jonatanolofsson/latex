@@ -20,10 +20,6 @@
   \end{figure}%
 }
 
-%% Math functions
-\renewcommand{\sin}[1]{sin\left(#1\right)}
-\renewcommand{\cos}[1]{cos\left(#1\right)}
-
 %% Initialize new chapter
 \newcommand{\newchapter}[1]{%
 	\renewcommand{\currentchapter}{#1}
@@ -32,3 +28,19 @@
 }
 
 \newcommand{\matlab}{\textsc{Matlab}}
+\newcommand{\email}[1]{\href{mailto:#1}{#1}}
+
+\floatname{algorithm}{Procedure}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\enumber}[2]{{#1}\mathrm{e}{#2}}
+
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
