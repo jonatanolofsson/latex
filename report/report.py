@@ -4,6 +4,7 @@ import sys
 import argparse
 import shutil
 import subprocess
+import datetime
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 REPORT_DIR = os.path.dirname(THIS_DIR)
@@ -37,16 +38,21 @@ def _is_inside_chapter():
     return _indexfile('..') is not None
 
 
-def _git_reference(short=True):
+def _git_sha1():
+    """Get git sha1."""
+    return subprocess.check_output(
+        GIT + ['rev-parse', '--short', 'HEAD'],
+        universal_newlines=True).strip()
+
+
+def _git_reference():
     """Get hash of git directory."""
     tag = subprocess.check_output(
         GIT + ['tag', '--points-at', 'HEAD'],
         universal_newlines=True).strip()
-    if not tag:
-        tag = subprocess.check_output(
-            GIT + ['rev-parse', '--short', 'HEAD'],
-            universal_newlines=True).strip()
-    return tag
+    if tag:
+        return tag
+    return _git_sha1()
 
 
 def _sed_replace(file_, match, replacement):
@@ -155,8 +161,14 @@ def export(*argv):
     """Export report."""
     assert _is_inside_report(), "Must be inside report directory"
     with open(_indexfile(), 'r') as f:
-        filename = f.readline().strip('%').strip()
-    dst = os.path.abspath('/'.join([os.path.dirname(_indexfile()), filename]))
-    dst += '_' + _git_reference() + '.pdf'
+        name_template = f.readline().strip('%').strip()
+    filename = name_template.format(
+        ref=_git_reference(),
+        sha1=_git_sha1(),
+        date=datetime.date.today().strftime('%Y-%m-%d'),
+        time=datetime.datetime.now().strftime("%H:%M")
+    )
+    dst = os.path.abspath('/'.join(
+        [os.path.dirname(_indexfile()), filename + '.pdf']))
     src = os.path.splitext(_indexfile())[0] + '.pdf'
     shutil.copyfile(src, dst)
