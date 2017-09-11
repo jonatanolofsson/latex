@@ -169,6 +169,8 @@ def rename_chapter(*argv):
     args = argparser.parse_args(argv)
     assert os.path.exists(args.name), "Chapter does not exist"
     shutil.move(args.name, args.newname)
+    shutil.move("{newname}/{name}.tex".format(name=args.name, newname=args.newname),
+                "{newname}/{newname}.tex".format(newname=args.newname))
     _sed_replace(_indexfile(),
                  _newchapter(args.name),
                  _newchapter(args.newname))
