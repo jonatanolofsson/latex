@@ -177,18 +177,34 @@ def rename_chapter(*argv):
     print("Renamed chapter ", args.name, ' -> ', args.newname)
 
 
-def export(*argv):
-    """Export report."""
-    assert _is_inside_report(), "Must be inside report directory"
+def get_filename():
+    """Get the export filename."""
     with open(_indexfile(), 'r') as f:
         name_template = f.readline().strip('%').strip()
     filename = name_template.format(
         ref=_git_reference(),
         sha1=_git_sha1(),
         date=datetime.date.today().strftime('%Y-%m-%d'),
-        time=datetime.datetime.now().strftime("%H:%M")
+        time=datetime.datetime.now().strftime("%H:%M"),
+        miltime=datetime.datetime.now().strftime("%H%M")
     )
+    return filename
+
+
+def export(*argv):
+    """Export report."""
+    assert _is_inside_report(), "Must be inside report directory"
+    filename = get_filename()
     dst = os.path.abspath('/'.join(
         [os.path.dirname(_indexfile()), filename + '.pdf']))
     src = os.path.splitext(_indexfile())[0] + '.pdf'
     shutil.copyfile(src, dst)
+
+
+def tag(*argv):
+    """Tag git repo."""
+    tag = get_filename()
+    subprocess.check_output(
+        GIT + ['tag', '-a', '-m', tag, tag, 'HEAD'],
+        universal_newlines=True).strip()
+    print("Set tag", tag)
