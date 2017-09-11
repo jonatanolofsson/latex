@@ -13,6 +13,7 @@ FNMAP = {
     "init": report.init,
     "add": report.add_chapter,
     "fig": report.add_figure,
+    "table": report.add_table,
     "remove": report.remove_chapter,
     "rename": report.rename_chapter,
     "export": report.export

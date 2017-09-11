@@ -12,6 +12,7 @@ TEMPLATE_DIR = os.path.join(REPORT_DIR, 'template')
 INIT_TEMPLATE = os.path.join(TEMPLATE_DIR, "skel")
 CHAPTER_TEMPLATE = os.path.join(TEMPLATE_DIR, "chapter")
 FIGURE_TEMPLATE = os.path.join(TEMPLATE_DIR, 'figure.py')
+TABLE_TEMPLATE = os.path.join(TEMPLATE_DIR, 'table.py')
 INDEXFILE = 'report.tex'
 SED = ['gsed' if sys.platform == 'darwin' else 'sed']
 GIT = ['git']
@@ -20,7 +21,7 @@ GIT = ['git']
 def _indexfile(path='.'):
     """Get name of index texfile."""
     path = os.path.abspath(path)
-    while path:
+    while path and path != '/':
         indexfile = os.path.abspath('/'.join([path, INDEXFILE]))
         if os.path.exists(indexfile):
             return indexfile
@@ -126,6 +127,23 @@ def add_figure(*argv):
             print("Figure exists: ", name)
             continue
         with open(FIGURE_TEMPLATE, 'r') as input_file:
+            with open(filename, 'w') as output_file:
+                output_file.write(input_file.read().format(name=name))
+
+
+def add_table(*argv):
+    """Add new python latex table."""
+    assert _is_inside_report(), "Must be inside report directory"
+    assert _is_inside_chapter(), "Must be inside chapter directory"
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("names", help="Table names", nargs='+')
+    args = argparser.parse_args(argv)
+    for name in args.names:
+        filename = name + '.py'
+        if os.path.exists(filename):
+            print("Table exists: ", name)
+            continue
+        with open(TABLE_TEMPLATE, 'r') as input_file:
             with open(filename, 'w') as output_file:
                 output_file.write(input_file.read().format(name=name))
 
