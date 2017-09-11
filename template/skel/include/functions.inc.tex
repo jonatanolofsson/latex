@@ -1,30 +1,63 @@
 \newcommand{\currentchapter}{}
-\newcommand{\image}[2]{%
+\newcommand\image[2]{%
   \begin{figure}[H]%
     \centering%
     \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
   \end{figure}%
 }
-\newcommand{\fig}[4]{%
+\WithSuffix\newcommand\image*[2]{%
+  \begin{figure*}%
+    \centering%
+    \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
+  \end{figure*}%
+}
+\newcommand\fig[4]{%
   \begin{figure}[H]%
     \centering%
     \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
     \caption{#3}\label{#4}%
   \end{figure}%
 }
-\newcommand{\tikzfig}[4]{%
+\WithSuffix\newcommand\fig*[4]{%
+  \begin{figure*}%
+    \centering%
+    \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
+    \caption{#3}\label{#4}%
+  \end{figure*}%
+}
+\newcommand\tbl[3]{%
+  \begin{table}[H]%
+    \centering%
+    \caption{#2}\label{#3}%
+    \input{\currentchapter/#1}%
+  \end{table}%
+}
+\WithSuffix\newcommand\tbl*[3]{%
+  \begin{table*}%
+    \centering%
+    \caption{#2}\label{#3}%
+    \input{\currentchapter/#1}%
+  \end{table*}%
+}
+\newcommand\tikzfig[4]{%
   \begin{figure}[H]%
     \centering%
     \resizebox{#1\linewidth}{!}{\input{\currentchapter/#2}}%
     \caption{#3}\label{#4}%
   \end{figure}%
 }
+\WithSuffix\newcommand\tikzfig*[4]{%
+  \begin{figure*}%
+    \centering%
+    \resizebox{#1\linewidth}{!}{\input{\currentchapter/#2}}%
+    \caption{#3}\label{#4}%
+  \end{figure*}%
+}
 
 %% Initialize new chapter
 \newcommand{\newchapter}[1]{%
 	\renewcommand{\currentchapter}{#1}
 	\include*{#1/#1}
-    \clearpage
 }
 
 \newcommand{\matlab}{\textsc{Matlab}}
