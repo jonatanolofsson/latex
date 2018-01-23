@@ -1,4 +1,4 @@
 TOP = $(TUP_CWD)
 !python = |> python3 -B %f |>
-!latex = |> latexmk -pdf %f |> %B.pdf | %B.aux %B.log %B.out %B.fls %B.nav %B.toc %B.snm %B.fdb_latexmk
+!latex = |> latexmk -pdf %f |> %B.pdf | %B.aux %B.log %B.out %B.fls %B.fdb_latexmk
 .gitignore
