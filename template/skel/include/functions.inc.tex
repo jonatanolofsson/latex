@@ -11,11 +11,11 @@
     \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
   \end{figure*}%
 }
-\newcommand\fig[4]{%
-  \begin{figure}[H]%
+\newcommand{\fig}[5][t]{%
+  \begin{figure}[#1]%
     \centering%
-    \includegraphics[width=#1\linewidth]{\currentchapter/#2}%
-    \caption{#3}\label{#4}%
+    \includegraphics[width=#2\linewidth]{\currentchapter/#3}%
+    \caption{#4}\label{#5}%
   \end{figure}%
 }
 \WithSuffix\newcommand\fig*[4]{%
@@ -39,11 +39,11 @@
     \input{\currentchapter/#1}%
   \end{table*}%
 }
-\newcommand\tikzfig[4]{%
-  \begin{figure}[H]%
+\newcommand\tikzfig[5][t]{%
+  \begin{figure}[#1]%
     \centering%
-    \resizebox{#1\linewidth}{!}{\input{\currentchapter/#2}}%
-    \caption{#3}\label{#4}%
+    \resizebox{#2\linewidth}{!}{\input{\currentchapter/#3}}%
+    \caption{#4}\label{#5}%
   \end{figure}%
 }
 \WithSuffix\newcommand\tikzfig*[4]{%
