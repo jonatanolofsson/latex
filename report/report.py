@@ -41,16 +41,22 @@ def _is_inside_chapter():
 
 def _git_sha1():
     """Get git sha1."""
-    return subprocess.check_output(
-        GIT + ['rev-parse', '--short', 'HEAD'],
-        universal_newlines=True).strip()
+    try:
+        return subprocess.check_output(
+            GIT + ['rev-parse', '--short', 'HEAD'],
+            universal_newlines=True).strip()
+    except subprocess.CalledProcessError:
+        return None
 
 
 def _git_reference():
     """Get hash of git directory."""
-    tag = subprocess.check_output(
-        GIT + ['tag', '--points-at', 'HEAD'],
-        universal_newlines=True).strip()
+    try:
+        tag = subprocess.check_output(
+            GIT + ['tag', '--points-at', 'HEAD'],
+            universal_newlines=True).strip()
+    except subprocess.CalledProcessError:
+        return None
     if tag:
         return tag
     return _git_sha1()
