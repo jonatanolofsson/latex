@@ -5,6 +5,7 @@ import argparse
 import shutil
 import subprocess
 import datetime
+import re
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 REPORT_DIR = os.path.dirname(THIS_DIR)
@@ -27,6 +28,10 @@ def _indexfile(path='.'):
             return indexfile
         path = os.path.dirname(path)
     return None
+
+
+def _get_root():
+    return os.path.dirname(_indexfile())
 
 
 def _is_inside_report():
@@ -69,7 +74,7 @@ def _sed_replace(file_, match, replacement):
 
 
 def _sed_remove(file_, match):
-    """Run sed, inplace on file, to replace string."""
+    """Run sed, inplace on file, to remove string."""
     subprocess.run(SED + ['-i', '/' + match + '/d', file_])
 
 
@@ -214,3 +219,34 @@ def tag(*argv):
         GIT + ['tag', '-a', '-m', tag, tag, 'HEAD'],
         universal_newlines=True).strip()
     print("Set tag", tag)
+
+
+def _get_chapters():
+    assert _is_inside_report(), "Must be inside report directory"
+    chapters = []
+    with open(_indexfile()) as handle:
+        for row in handle:
+            m = re.search(r"newchapter{([^}]+)}", row)
+            if m:
+                chapters.append(m[1])
+    return chapters
+
+
+def list_chapters(*argv):
+    assert _is_inside_report(), "Must be inside report directory"
+    for chapter in _get_chapters():
+        print(chapter)
+
+
+def list_chapterfiles(*argv):
+    assert _is_inside_report(), "Must be inside report directory"
+    for chapter in _get_chapters():
+        print(f"{chapter}/{chapter}.tex")
+
+
+def list_texfiles(*argv):
+    assert _is_inside_report(), "Must be inside report directory"
+    print(os.path.relpath(_indexfile()))
+    root = _get_root()
+    for chapter in _get_chapters():
+        print(os.path.relpath(f"{root}/{chapter}/{chapter}.tex"))
