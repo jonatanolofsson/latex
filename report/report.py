@@ -127,8 +127,6 @@ def add_chapter(*argv):
 
 def add_figure(*argv):
     """Add new python figure."""
-    assert _is_inside_report(), "Must be inside report directory"
-    assert _is_inside_chapter(), "Must be inside chapter directory"
     argparser = argparse.ArgumentParser()
     argparser.add_argument("names", help="Figure names", nargs='+')
     args = argparser.parse_args(argv)
